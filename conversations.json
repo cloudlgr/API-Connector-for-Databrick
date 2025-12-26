@@ -1,0 +1,353 @@
+{
+    "_comment_1": "#API Connection Settings",
+    "API_URL": "https://api.euw2.pure.cloud/api/v2/analytics/conversations/details/query",
+	"HTTP_METHOD": "POST",
+    "CLIENT_ID": "32e9a609-7e70-4ca1-8bb5-988ff17dce3a",
+    "CLIENT_SECRET": "vKDslhSwqjJp2dz6XTwmf1E5Ov4Ys0tRqGLQwp-v3Zc",
+    "TOKEN_URL": "https://login.euw2.pure.cloud/oauth/token",
+    
+    "_comment_2": "#Date Range Settings -- leave it blank if its a get method or doesn' require a payload",
+    "START_DATE": "2025-07-01T00:00:00.000Z",
+    "END_DATE": "2025-07-15T23:59:59.999Z",
+    "RETRIEVAL_INTERVAL": 7,
+    
+    "_comment_3": "#API Request Settings",
+    "MAX_RETRIES": 3,
+    "RETRY_DELAY": 5,
+    "PAGE_SIZE": 100,
+    
+    "_comment_4": "#Use {start_date}, {end_date}, {page_size}, {page_number} as placeholders -- leave it blank if its a get method or doesn' require a payload",
+    "REQUEST_PAYLOAD": {
+        "interval": "{start_date}/{end_date}",
+        "order": "asc",
+        "orderBy": "conversationStart",
+        "paging": {
+            "pageSize": "{page_size}",
+            "pageNumber": "{page_number}"
+        },
+        "segmentFilters": [
+            {
+                "type": "or",
+                "predicates": [
+                    {
+                        "dimension": "mediaType",
+                        "value": "email"
+                    }
+                ]
+            }
+        ]
+    },
+    
+    
+    "pages": "totalHits",
+    
+	"bronze_schema": "bronze",
+	"silver_schema": "silver",
+	"raw_table_name": "genesys_conversation_emails_raw",
+	
+	
+	"_comment_5": "Main silver table, #Response Schema Mapping",
+	"main_table_name": "genesys_conversation_emails_new",
+	"main_table_key": "conversationId",
+    "data": "conversations",
+    "data_schema": {
+        "conferenceStart": "timestamp",
+        "conversationEnd": "timestamp",
+        "conversationId": "string",
+        "conversationInitiator": "string",
+        "conversationStart": "timestamp",
+        "customerParticipation": "boolean",
+        "divisionIds": "array",
+        "externalTag": "string",
+        "inactivityTimeout": "string",
+        "knowledgeBaseIds": "array",
+        "mediaStatsMinConversationMos": "int",
+        "mediaStatsMinConversationRFactor": "int",
+        "originatingDirection": "string",
+        "originatingSocialMediaPublic": "boolean",
+        "selfServed": "boolean",
+        "evaluations": "array",
+        "surveys": "array",
+        "resolutions": "array",
+        "participants": "array"
+    },
+	
+	"_comment_6": "#silver tables to unnested add here",
+    "nested_tables": [
+        {
+            "unnested_to_table": "genesys_conversation_emails_participants_new",
+            "parent_key": {"conversationId": "string"},
+			"unnested_to_table_key": ["participantId"],
+            "unnested_column": ["participants"],
+            "data_schema": {
+                "externalContactId": "string",
+                "externalOrganizationId": "string",
+                "flaggedReason": "string",
+                "participantId": "string",
+                "participantName": "string",
+                "purpose": "string",
+                "screenRecording": "boolean",
+                "teamId": "string",
+                "userId": "string",
+                "sessions": "array"
+            }
+        },
+        {
+            "unnested_to_table": "genesys_conversation_emails_participants_sessions_new",
+            "parent_key": {"conversationId": "string", "participantId": "string"},
+			"unnested_to_table_key": ["sessionId"],
+            "unnested_column": ["participants", "sessions"],
+            "data_schema": {
+                "activeSkillIds": "array",
+                "acwSkipped": "boolean",
+                "addressFrom": "string",
+                "addressOther": "string",
+                "addressSelf": "string",
+                "addressTo": "string",
+                "agentAssistantId": "string",
+                "agentBullseyeRing": "int",
+                "agentOwned": "boolean",
+                "ani": "string",
+                "assignerId": "string",
+                "authenticated": "boolean",
+                "bargedParticipantId": "string",
+                "bcc": "array",
+                "callbackNumbers": "array",
+                "callbackScheduledTime": "string",
+                "callbackUserName": "string",
+                "cc": "array",
+                "cleared": "boolean",
+                "coachedParticipantId": "string",
+                "cobrowseRole": "string",
+                "cobrowseRoomId": "string",
+                "deliveryPushed": "boolean",
+                "deliveryStatus": "string",
+                "deliveryStatusChangeDate": "string",
+                "destinationAddresses": "array",
+                "detectedSpeechEnd": "string",
+                "detectedSpeechStart": "string",
+                "direction": "string",
+                "dispositionAnalyzer": "string",
+                "dispositionName": "string",
+                "dnis": "string",
+                "edgeId": "string",
+                "eligibleAgentCounts": "array",
+                "engagementSource": "string",
+                "extendedDeliveryStatus": "string",
+                "flowInType": "string",
+                "flowOutType": "string",
+                "journeyActionId": "string",
+                "journeyActionMapId": "string",
+                "journeyActionMapVersion": "int",
+                "journeyCustomerId": "string",
+                "journeyCustomerIdType": "string",
+                "journeyCustomerSessionId": "string",
+                "journeyCustomerSessionIdType": "string",
+                "mediaBridgeId": "string",
+                "mediaCount": "int",
+                "mediaType": "string",
+                "messageType": "string",
+                "monitoredParticipantId": "string",
+                "outboundCampaignId": "string",
+                "outboundContactId": "string",
+                "outboundContactListId": "string",
+                "peerId": "string",
+                "protocolCallId": "string",
+                "provider": "string",
+                "recording": "boolean",
+                "remote": "string",
+                "remoteNameDisplayable": "string",
+                "removedSkillIds": "array",
+                "requestedRoutings": "array",
+                "roomId": "string",
+                "routingRing": "int",
+                "routingRule": "string",
+                "routingRuleType": "string",
+                "screenShareAddressSelf": "string",
+                "screenShareRoomId": "string",
+                "scriptId": "string",
+                "selectedAgentId": "string",
+                "selectedAgentRank": "int",
+                "sessionDnis": "string",
+                "sessionId": "string",
+                "sharingScreen": "boolean",
+                "skipEnabled": "boolean",
+                "timeoutSeconds": "int",
+                "usedRouting": "string",
+                "videoAddressSelf": "string",
+                "videoRoomId": "string",
+                "waitingInteractionCounts": "array",
+                "agentGroups": "array",
+                "proposedAgents": "array",
+                "mediaEndpointStats": "array",
+                "flow": "struct",
+                "outcomes": "array",
+                "metrics": "array",
+                "segments": "array"
+            }
+        },
+        {
+            "unnested_to_table": "genesys_conversation_emails_participants_sessions_metrics_new",
+            "parent_key": {"conversationId": "string", "participantId": "string", "sessionId": "string"},
+			"unnested_to_table_key": ["emitDate", "name"],
+            "unnested_column": ["participants", "sessions", "metrics"],
+            "data_schema": {
+                "emitDate": "timestamp",
+                "name": "string",
+                "value": "int"
+            }
+        },
+        {
+            "unnested_to_table": "genesys_conversation_email_resolutions_new",
+            "parent_key": {"conversationId": "string"},
+			"unnested_to_table_key": ["eventTime", "queueId","userId"],
+            "unnested_column": ["resolutions"],
+            "data_schema": {
+                "eventTime": "timestamp",
+                "queueId": "string",
+                "userId": "string",
+                "nNextContactAvoided": "int"
+            }
+        }
+    ],
+	
+	"_comment_7": "#full table schema (optional)",
+    "full_schema":
+	{
+	"conferenceStart": "TIMESTAMP",
+	"conversationEnd": "TIMESTAMP",
+	"conversationId": "STRING",
+	"conversationInitiator": "STRING",
+	"conversationStart": "TIMESTAMP",
+	"customerParticipation": "BOOLEAN",
+	"divisionIds": "ARRAY<STRING>",
+	"externalTag": "STRING",
+	"inactivityTimeout": "STRING",
+	"knowledgeBaseIds": "STRING",
+	"mediaStatsMinConversationMos": "INT",
+	"mediaStatsMinConversationRFactor": "INT",
+	"originatingDirection": "STRING",
+	"originatingSocialMediaPublic": "BOOLEAN",
+	"selfServed": "BOOLEAN",
+	"evaluations": [
+	{
+	  "assigneeApplicable": "BOOLEAN",
+	  "calibrationId": "STRING",
+	  "contextId": "STRING",
+	  "deleted": "BOOLEAN",
+	  "evaluationId": "STRING",
+	  "evaluationStatus": "STRING",
+	  "evaluatorId": "STRING",
+	  "eventTime": "STRING",
+	  "formId": "STRING",
+	  "formName": "STRING",
+	  "oTotalCriticalScore": "BIGINT",
+	  "oTotalScore": "BIGINT",
+	  "queueId": "STRING",
+	  "released": "BOOLEAN",
+	  "rescored": "BOOLEAN",
+	  "userId": "STRING"
+	}
+	],
+	"surveys": "STRING",
+	"resolutions": [
+	{
+	  "eventTime": "STRING",
+	  "nNextContactAvoided": "BIGINT",
+	  "queueId": "STRING",
+	  "userId": "STRING"
+	}
+	],
+	"participants": [
+	{
+	  "externalContactId": "STRING",
+	  "participantId": "STRING",
+	  "participantName": "STRING",
+	  "purpose": "STRING",
+	  "sessions": [
+		{
+		  "acwSkipped": "BOOLEAN",
+		  "addressFrom": "STRING",
+		  "addressOther": "STRING",
+		  "addressSelf": "STRING",
+		  "addressTo": "STRING",
+		  "agentBullseyeRing": "BIGINT",
+		  "assignerId": "STRING",
+		  "bcc": "ARRAY<STRING>",
+		  "cc": "ARRAY<STRING>",
+		  "direction": "STRING",
+		  "eligibleAgentCounts": "ARRAY<BIGINT>",
+		  "flow": {
+			"endingLanguage": "STRING",
+			"entryReason": "STRING",
+			"entryType": "STRING",
+			"exitReason": "STRING",
+			"flowId": "STRING",
+			"flowName": "STRING",
+			"flowType": "STRING",
+			"flowVersion": "STRING",
+			"outcomes": [
+			  {
+				"flowOutcome": "STRING",
+				"flowOutcomeEndTimestamp": "STRING",
+				"flowOutcomeId": "STRING",
+				"flowOutcomeStartTimestamp": "STRING",
+				"flowOutcomeValue": "STRING"
+			  }
+			],
+			"startingLanguage": "STRING",
+			"transferTargetAddress": "STRING",
+			"transferTargetName": "STRING",
+			"transferType": "STRING"
+		  },
+		  "flowInType": "STRING",
+		  "flowOutType": "STRING",
+		  "mediaType": "STRING",
+		  "metrics": [
+			{
+			  "emitDate": "STRING",
+			  "name": "STRING",
+			  "value": "BIGINT"
+			}
+		  ],
+		  "peerId": "STRING",
+		  "provider": "STRING",
+		  "remote": "STRING",
+		  "requestedRoutings": "ARRAY<STRING>",
+		  "routingRing": "BIGINT",
+		  "routingRule": "STRING",
+		  "routingRuleType": "STRING",
+		  "segments": [
+			{
+			  "conference": "BOOLEAN",
+			  "disconnectType": "STRING",
+			  "errorCode": "STRING",
+			  "queueId": "STRING",
+			  "requestedRoutingUserIds": "ARRAY<STRING>",
+			  "scoredAgents": [
+				{
+				  "agentScore": "BIGINT",
+				  "scoredAgentId": "STRING"
+				}
+			  ],
+			  "segmentEnd": "STRING",
+			  "segmentStart": "STRING",
+			  "segmentType": "STRING",
+			  "subject": "STRING",
+			  "wrapUpCode": "STRING",
+			  "wrapUpNote": "STRING"
+			}
+		  ],
+		  "selectedAgentId": "STRING",
+		  "sessionId": "STRING",
+		  "usedRouting": "STRING",
+		  "waitingInteractionCounts": "ARRAY<BIGINT>"
+		}
+	  ],
+	  "teamId": "STRING",
+	  "userId": "STRING"
+	}
+	]
+	}
+
+}
